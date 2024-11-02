@@ -1,5 +1,8 @@
 const root = document.documentElement;
 
+let referenceWidth = 1920;
+let referenceHeight = 1080;
+
 const canvas = document.getElementsByClassName("title-canvas")[0];
 const ctx = canvas.getContext("2d");
 const cursor = document.querySelector(".pointer");
@@ -16,6 +19,8 @@ let lightSpotX = 0, lightSpotY = 0;
 let mouseY = 0;
 let mouseX = 0;
 
+let isMouseDown = false;
+
 const cursorSize = cursor.getBoundingClientRect().width / 2;
 const lightSpotSize = colorSpot.getBoundingClientRect().width / 2;
 
@@ -24,32 +29,53 @@ const dimensions = getObjectFitSize(
     true,
     canvas.clientWidth,
     canvas.clientHeight,
-    canvas.width,
-    canvas.height
-  );
+    window.outerWidth,
+    window.outerHeight
+);
 
 canvas.width = dimensions.width;
 canvas.height = dimensions.height;
 
-const minDistance = 70;
-const pixelsBetween = 50;
-const numX = canvas.width / pixelsBetween;
-const numY = canvas.height / pixelsBetween;
+let minDistance = 70;
+let pixelsBetween = 50;
+let intensity = 6;
+const numX = window.innerWidth / pixelsBetween;
+const numY = window.innerHeight / pixelsBetween;
 
 window.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
 });
 
+window.addEventListener('resize', (e) => {
+    const dimensions = getObjectFitSize(
+        true,
+        canvas.clientWidth,
+        canvas.clientHeight,
+        window.outerWidth,
+        window.outerHeight
+    );
+    canvas.width = dimensions.width;
+    canvas.height = dimensions.height;
+});
+
 function animate() {
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const targetValue = isMouseDown ? 12 : 6;
+    
+    intensity += (targetValue - intensity) * 0.05;
+
+    if (Math.abs(targetValue - intensity) < 0.01) {
+        intensity = targetValue;
+    }
+
     for (let i = 0; i < numX; i++) {
         for (let k = 0; k < numY; k++) {
             const effectiveDistance = 700;
-            const intensity = 6;
-            const changeX = pixelsBetween * i - cursor.getBoundingClientRect().x * (Math.abs(numX/2 - k) * Math.abs(numX/2 - i)) / 40;
-            const changeY = pixelsBetween * k - cursor.getBoundingClientRect().y;
+            const changeX = (pixelsBetween * window.outerHeight / referenceHeight) * i - (cursor.getBoundingClientRect().x * window.outerHeight / referenceHeight) * (Math.abs(numX/2 - k) * Math.abs(numX/2 - i)) / 40;
+            const changeY = (pixelsBetween * window.outerWidth / referenceWidth) * k - (cursor.getBoundingClientRect().y * window.outerWidth / referenceWidth);
             let distance = Math.sqrt(Math.pow(changeX, 2) + Math.pow(changeY, 2));
 
             distance = Math.max(distance, minDistance);
@@ -64,7 +90,7 @@ function animate() {
             ctx.arc(
                 (pixelsBetween) * i + (force * angleX) / intensity,
                 (pixelsBetween) * k + (force * angleY) / intensity,
-                3, 
+                Math.max(3, force / distance) * (window.outerWidth + window.outerHeight) / (referenceWidth + referenceHeight), 
                 0, 
                 2 * Math.PI
             );
@@ -85,8 +111,14 @@ function animate() {
 
         if (letterDistance < 7 * effectiveRange) {
             let adjustmentAmount = Math.round(100 * distancePercent);
-            let newColor = adjustRGBColor(getComputedStyle(root).getPropertyValue('--tColorMain'), 'red', -2 * adjustmentAmount);
-            newColor = adjustRGBColor(newColor, 'green', -1 * adjustmentAmount);
+            let newColor;
+            if (isMouseDown) {
+                newColor = adjustRGBColor(getComputedStyle(root).getPropertyValue('--tColorMain'), 'blue', -1.7 * adjustmentAmount);
+                newColor = adjustRGBColor(newColor, 'green', -1.7 * adjustmentAmount);
+            } else {
+                newColor = adjustRGBColor(getComputedStyle(root).getPropertyValue('--tColorMain'), 'red', -2 * adjustmentAmount);
+                newColor = adjustRGBColor(newColor, 'green', -1 * adjustmentAmount);
+            }
             
             element.style.color = newColor;
             element.style.fontSize = (adjustmentAmount / 50 + 4) + "rem";
@@ -113,12 +145,14 @@ window.addEventListener('mousedown', (e) => {
     cursor.style.backgroundColor = "red";
     cursor.style.width = "9px";
     cursor.style.height = "9px";
+    isMouseDown = true;
 });
 
 window.addEventListener('mouseup', (e) => {
     cursor.style.backgroundColor = getComputedStyle(root).getPropertyValue('--pointerColor');
     cursor.style.width = "13px";
     cursor.style.height = "13px";
+    isMouseDown = false;
 });
 
 const updateOnScroll = () => {
