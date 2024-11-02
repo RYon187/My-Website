@@ -36,8 +36,8 @@ body {
     width: 700px;
     height: 700px;
     border-radius: 50%;
-    background: radial-gradient(var(--pointerColor), #00000000 40%);
-    opacity: 0.05;
+    background: radial-gradient(var(--pointerColor), #00000000 60%);
+    opacity: 0.035;
     transition: transform 0.1s;
     z-index: 1;
     pointer-events: none;

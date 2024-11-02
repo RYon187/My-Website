@@ -31,6 +31,7 @@ const dimensions = getObjectFitSize(
 canvas.width = dimensions.width;
 canvas.height = dimensions.height;
 
+const minDistance = 70;
 const pixelsBetween = 50;
 const numX = canvas.width / pixelsBetween;
 const numY = canvas.height / pixelsBetween;
@@ -41,13 +42,13 @@ window.addEventListener('mousemove', (e) => {
 });
 
 function animate() {
+    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const minDistance = 100;
     for (let i = 0; i < numX; i++) {
         for (let k = 0; k < numY; k++) {
-            const effectiveDistance = 700; 
+            const effectiveDistance = 700;
             const intensity = 6;
-            const changeX = pixelsBetween * i - cursor.getBoundingClientRect().x;
+            const changeX = pixelsBetween * i - cursor.getBoundingClientRect().x * (Math.abs(numX/2 - k) * Math.abs(numX/2 - i)) / 40;
             const changeY = pixelsBetween * k - cursor.getBoundingClientRect().y;
             let distance = Math.sqrt(Math.pow(changeX, 2) + Math.pow(changeY, 2));
 
@@ -61,8 +62,8 @@ function animate() {
             ctx.strokeStyle = 'transparent';
             ctx.beginPath();
             ctx.arc(
-                pixelsBetween * i + (force * angleX) / intensity,
-                pixelsBetween * k + (force * angleY) / intensity,
+                (pixelsBetween) * i + (force * angleX) / intensity,
+                (pixelsBetween) * k + (force * angleY) / intensity,
                 3, 
                 0, 
                 2 * Math.PI
@@ -127,15 +128,13 @@ const updateOnScroll = () => {
     const darkenAmount = Math.min(scrollY / maxScroll * 100, 100); 
 
     const baseColor = getComputedStyle(root).getPropertyValue('--tColorMain');
-    const newColor = darkenColor(baseColor, darkenAmount);
 
-    menuContainer.style.borderColor = newColor;
-    // titleText.style.color = newColor;
-    // titleSubtext.style.color = newColor;
-    let i = menuItems.length;
+    menuContainer.style.opacity = (window.scrollY != 0) ? 1 - window.scrollY * 1.25 / maxScroll : 1;
+
+    let i = menuItems.length - 1;
     Array.from(menuItems).forEach(element => {
         i--; 
-        element.style.color = newColor; 
+        element.style.opacity = (window.scrollY != 0) ? 1 - (scrollY * i/1.5) / maxScroll : 1;
         element.style.transform = `translateX(${Math.pow((scrollY * i)/100, 2 + i/10)}%)`;
     });
 };
