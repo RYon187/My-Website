@@ -5,18 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+    </style>
 </head>
 <body>
-    <div class="pointer">
-
-    </div>
+    <div class="pointer"></div>
+    <div class="color-spot"></div>
     <div class="title-page-container">
         <canvas class="title-canvas"></canvas>
         <div class="title-container">
-            <h1 class="title-text">Title Text</h1>
-            <h2 class="title-subtext">Something</h2>
+            <h1 class="title-text split-text">Ryan</h1>
+            <h2 class="title-subtext split-text">Jo</h2>
         </div>
     </div>
+        <script>
+            const text = document.getElementsByClassName("split-text");
+
+            Array.from(text).forEach(element => {
+                const elementType = element.tagName.toLowerCase();
+                const parentDiv = element.parentElement
+
+                const divElement = document.createElement('div')
+                divElement.className = element.classList[0] + "-container";
+                console.log(divElement);
+
+                for (let char of element.textContent) {
+                    const charElement = document.createElement(elementType);
+                    charElement.textContent = char; 
+
+                    charElement.className = 'letter'; 
+
+                    divElement.appendChild(charElement);
+                    parentDiv.appendChild(divElement)
+                }
+
+                element.remove();
+            });
+        </script>
     <div class="menu-container">
         <ul>
             <li class="menu-item">Home</li>

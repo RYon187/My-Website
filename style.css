@@ -1,7 +1,7 @@
 :root {
     --bColor: rgb(20, 20, 20);
     --bColor2: rgb(10, 10, 10);
-    --tColorMain: #e2e2e2;
+    --tColorMain: rgb(226, 226, 226);
     --pointerColor: rgb(115, 192, 202);
     --dotColor: #333333;
 }
@@ -14,7 +14,7 @@ body {
     background-color: var(--bColor);
     margin: 0;
     padding: 0;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: "Rubik";
     display: block;
     overflow-y: auto;
 }
@@ -26,7 +26,21 @@ body {
     background-color: var(--pointerColor);
     border-radius: 50%;
     transition: transform 0.1s;
-    z-index: 999;
+    transition: width, height, 0.3s ease-out;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.color-spot {
+    position: absolute;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(var(--pointerColor), #00000000 40%);
+    opacity: 0.05;
+    transition: transform 0.1s;
+    z-index: 1;
+    pointer-events: none;
 }
 
 .title-page-container {
@@ -41,6 +55,7 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 0;
+    pointer-events: none;
 }
 
 .title-page-container .title-canvas {
@@ -49,6 +64,10 @@ body {
     position: fixed;
 }
 
+.title-text-container, .title-subtext-container {
+    display: flex;
+    gap: 1vw;
+}
 .title-container {
     position: fixed;
     display: flex;
@@ -57,19 +76,25 @@ body {
     align-items: center;
 }
 
-.title-container h1 {
+h1.letter {
     font-size: 4rem;
     color: var(--tColorMain);
     text-align: center;
     margin: 0;
+    transition: 0.3s;
+    text-transform: uppercase;
+    transform: scale(110%);
 }
 
-.title-container h2 {
+h2.letter {
     font-size: 2rem;
     color: var(--tColorMain);
     text-transform: lowercase;
     text-align: center;
     margin: 0;
+    transition: 0.3s;
+    text-transform: uppercase;
+    transform: scale(90%);
 }
 
 .menu-container {
@@ -84,8 +109,20 @@ body {
 
 .menu-container .menu-item {
     color: var(--tColorMain);
+    font-size: 1rem;
+    letter-spacing: 0.15rem;
     margin-bottom: 2vh;
     list-style: none;
+    transition: all 0.5 ease-out;
+    opacity: 0.7;
+    text-transform: lowercase;
+}
+
+.menu-container .menu-item:hover {
+    transform: scale(105%);
+    color:rgb(230, 60, 60);
+    opacity: 1;
+    cursor: pointer;
 }
 
 .play-button {
@@ -99,5 +136,5 @@ body {
     width: 100%;
     height: 100vh;
     background-color: var(--bColor);
-    z-index: 1;
+    z-index: 4;
 }
